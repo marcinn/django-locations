@@ -3,7 +3,8 @@
 # methods on the model.
 
 
-
+from urllib2 import HTTPError
+import unicodedata
 from django.db import models
 from django.db.models.query import QuerySet, Q
 from django.contrib.auth.models import User
@@ -11,8 +12,12 @@ import geopy
 
 from locations import settings
 
-geocoder = getattr(__import__('geopy.geocoders', globals(), locals(),
+try:
+    geocoder = getattr(__import__('geopy.geocoders', globals(), locals(),
     [settings.GEOCODER_BACKEND],), settings.GEOCODER_BACKEND)(settings.MAPS_API_KEY)
+except ImportError:
+    raise ValueError('Invalid LOCATION_GEOCODER_BACKEND: %s'
+            % settings.GEOCODER_BACKEND)
 
 
 class LocationQuerySet(QuerySet):
@@ -90,12 +95,18 @@ class LocationManager(models.Manager):
         elif isinstance(location, (str, unicode)):
             place = location
         elif isinstance(location, tuple):
-            place = '%f, %f' % location
+            place = u'%f, %f' % location
         elif isinstance(location, int):
             place = self.get_query_set().get(pk=location).place
         else:
             raise ValueError('invalid location argument')
-        return geocoder.geocode(place, exactly_one=not multiple)
+
+        try:
+            place = unicodedata.normalize('NFKD',
+                    unicode(place)).encode('ascii', 'ignore')
+            return geocoder.geocode(place, exactly_one=not multiple)
+        except HTTPError:
+            return self.model.DoesNotExist
 
 
 class Location(models.Model):
@@ -118,6 +129,9 @@ class Location(models.Model):
                 self.pk, self.place, self.latitude,
                 self.longitude)
 
+    def __unicode__(self):
+        return self.place
+
     def save(self, force_insert=None, force_update=None):
         """
         save Location instance
@@ -134,6 +148,10 @@ class Location(models.Model):
             self.place = normalize_location_name(self.place)
 
         return super(Location, self).save(force_insert, force_update)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('loc_detail', (self.id,), {})
 
 
 def normalize_location_name(name):

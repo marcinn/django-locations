@@ -5,6 +5,8 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
     url(r'^$', 'locations.views.your_locations', name='loc_yours'),
+    url(r'^(?P<id>[0-9]+)/$', 'locations.views.detail', name='loc_detail'),
+    url(r'^bookmark/(?P<id>[0-9]+)/$', 'locations.views.bookmark', name='loc_bookmark'),
     url(r'^new/$', 'locations.views.new', name='loc_new'),
     url(r'^checkin/$', 'locations.views.checkin', name='loc_checkin'),
     url(r'^friends/checkins/$', 'locations.views.friends_checkins', name='loc_friends'),
