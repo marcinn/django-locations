@@ -72,7 +72,7 @@ class LocationManager(models.Manager):
         """
         return self.get_query_set().named(name).get()
 
-    def geocode(self, location):
+    def geocode(self, location, multiple=False):
         """
         wrapper for geocoder
 
@@ -95,7 +95,7 @@ class LocationManager(models.Manager):
             place = self.get_query_set().get(pk=location).place
         else:
             raise ValueError('invalid location argument')
-        return geocoder.geocode(place)
+        return geocoder.geocode(place, exactly_one=not multiple)
 
 
 class Location(models.Model):
