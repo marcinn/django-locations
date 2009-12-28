@@ -1,22 +1,22 @@
 This is a fork of Brian Rosner`s django-locations.
 
-The most important changes are:
+The most important goals:
 
 * remove django-friends dependency (pinax)
 * add location managers (move some code from views to managers)
 * add support for more map APIs (original depends on yahoo maps)
 
 Dependencies
-------------
+============
 
 * geopy (http://code.google.com/p/geopy/)
 
 
 Usage
------
+=====
 
 Settings
-========
+--------
 
 In your project settings you can set:
 
@@ -27,7 +27,7 @@ In your project settings you can set:
   (valid geocoder class name supported by pygeo, ie. Google, Yahoo, default: Google)
 
 Geocoding
-=========
+---------
 
     from locations.models import Location
     Location.objects.geocode('Mount Everest')
@@ -51,7 +51,7 @@ Multiple result:
 
 
 Create locations
-================
+----------------
 
     from locations.models import Location, User
     user = User.objects.get(username='admin')
@@ -60,12 +60,12 @@ Create locations
     loc.save()
   
 
-During save geocoding is automatically called if latitude nor 
+Geocoding is automatically called during save, if latitude nor 
 longitude properties are not set.
 
 
 Search locations
-================
+----------------
 
 Search by name:
 
