@@ -141,7 +141,7 @@ class Location(models.Model):
         # geocode place if lat nor lon aren't set
         if not self.latitude or not self.longitude:
             self.geocoded_place, (self.latitude,
-            self.longitude) = self.__class__.objects.geocode(self.place)
+            self.longitude) = Location.objects.geocode(self.place)
 
         # normalize place name
         if not self.pk:
