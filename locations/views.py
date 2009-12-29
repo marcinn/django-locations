@@ -166,13 +166,18 @@ def nearby_checkins(request, distance=None):
         )
 
 
-def detail(request, slug=None, id=None, template_name=None, 
+def detail(request, id=None, template_name=None, 
         extra_context=None, queryset=None):
     """
     display location detail
     """
     queryset = queryset or Location.objects.all()
-    return object_detail(request, slug=slug, object_id=id, queryset=queryset,
+    extra_context = extra_context or {}
+    if request.user.is_authenticated():
+        extra_context['your_nearest_locations'] = Location.objects.filter(
+                user=request.user).nearest(queryset.get(pk=id))
+    
+    return object_detail(request, object_id=id, queryset=queryset,
             template_name = template_name, extra_context=extra_context)
 
 
