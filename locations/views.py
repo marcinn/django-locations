@@ -107,9 +107,7 @@ def checkin(request):
             )
             c.save()
             return HttpResponseRedirect(reverse('locations.views.your_locations'))
-    else:
-        return HttpResponseRedirect(reverse('locations.views.new'))
-checkin = login_required(checkin)
+    return HttpResponseRedirect(reverse('locations.views.new'))
 
 
 @login_required
