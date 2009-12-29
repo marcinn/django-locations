@@ -6,6 +6,7 @@
 from urllib2 import HTTPError
 import unicodedata
 from django.db import models
+from django.db.models import Min, Max
 from django.db.models.query import QuerySet, Q
 from django.contrib.auth.models import User
 import geopy
@@ -65,6 +66,16 @@ class LocationQuerySet(QuerySet):
         return self.filter(
                 Q(place__istartswith=normalized)\
                 | Q(geocoded_place__istartswith=normalized))
+
+    def get_bounds(self):
+        """
+        returns bounds as tuple ((lat,lon), (lat,lon))
+        for found locations
+        """
+        bounds = self.aggregate(Min('latitude'), Min('longitude'),
+                Max('latitude'), Max('longitude'))
+        return ((bounds['latitude__min'], bounds['longitude__min']),
+                (bounds['latitude__max'], bounds['longitude__max']))
 
 
 class LocationManager(models.Manager):
